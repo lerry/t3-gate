@@ -1,0 +1,25 @@
+services:
+  caddy:
+    image: caddy:2-alpine
+    container_name: caddy
+    network_mode: "host"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - /data/caddy/data:/data
+      - /data/caddy/config:/config
+    restart: always
+
+  t3-gate:
+    build: .
+    container_name: t3-gate
+    network_mode: "host"
+    environment:
+      # 替换为你的实际 HTTPS 域名（需与 Caddyfile 中的站点一致）
+      T3_GATE_ORIGIN: https://t3.example.com
+      T3_GATE_DATA_DIR: /data/t3-gate
+    volumes:
+      - /data/t3-gate:/data/t3-gate
+    read_only: true
+    cap_drop:
+      - ALL
+    restart: always

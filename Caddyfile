@@ -1,0 +1,28 @@
+(deny_robots) {
+	handle /robots.txt {
+		header Content-Type "text/plain; charset=utf-8"
+		respond <<ROBOTS
+			User-agent: *
+			Disallow: /
+
+			ROBOTS
+	}
+}
+
+t3.example.com {
+	import deny_robots
+
+	handle /_gate/login {
+		reverse_proxy 127.0.0.1:8787
+	}
+
+	handle {
+		forward_auth 127.0.0.1:8787 {
+			uri /_gate/verify
+			header_up -Authorization
+		}
+
+		# 替换为你的上游服务地址（例如 Tailscale 内网 IP + T3 Code 端口）
+		reverse_proxy http://100.64.0.10:3773
+	}
+}
